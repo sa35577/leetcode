@@ -1,13 +1,10 @@
 class NumArray {
 public:
-    vector<int> A;
     vector<int> psa;
     NumArray(vector<int>& nums) {
-        A.push_back(0);
-        psa.push_back(0);
-        for (int i = 0; i < nums.size(); i++) {
-            A.push_back(nums[i]);
-            psa.push_back(psa[i]+nums[i]);
+        psa.resize(nums.size()+1);
+        for (int i = 1; i < psa.size(); i++) {
+            psa[i] = psa[i-1] + nums[i-1];
         }
     }
     
