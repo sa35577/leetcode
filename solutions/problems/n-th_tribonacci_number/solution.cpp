@@ -2,13 +2,14 @@ class Solution {
 public:
     int tribonacci(int n) {
         if (n == 0) return 0;
-        if (n <= 2) return 1;
-        vector<long long> fib(n+1);
-        fib[0] = 0;
-        fib[1] = 1;
-        fib[2] = 1;
-        for (int i = 3; i <= n; i++) fib[i] = fib[i-1] + fib[i-2] + fib[i-3];
-        return fib.back();
-        
+        else if (n <= 2) return 1;
+        int t0 = 0, t1 = 1, t2 = 1;
+        for (int i = 3; i <= n; i++) {
+            int x = t0+t1+t2;
+            t0 = t1;
+            t1 = t2;
+            t2 = x;
+        }
+        return t2;
     }
 };
