@@ -11,14 +11,20 @@
  */
 class Solution {
 public:
-    int goodNodes(TreeNode* root) {
-        return trav(root,root->val);
-    }
-    int trav(TreeNode* root, int curMax) {
-        if (root == NULL) return 0;
-        if (curMax <= root->val) {
-            return 1+trav(root->left,root->val)+trav(root->right,root->val);
+    int goodNotes(TreeNode* root, int curMax) {
+        if (root == nullptr) return 0;
+        int x;
+        if (root->val >= curMax) {
+            x = 1;
         }
-        return trav(root->left,curMax)+trav(root->right,curMax);
+        else {
+            x = 0;
+        }
+        x += goodNotes(root->left,max(curMax,root->val));
+        x += goodNotes(root->right,max(curMax,root->val));
+        return x;
+    }
+    int goodNodes(TreeNode* root) {
+        return goodNotes(root,-100000);
     }
 };
