@@ -1,22 +1,34 @@
 class MyHashSet {
 public:
-    /** Initialize your data structure here. */
-    vector<bool> hashSet;
+    vector<int> v[10001];
     MyHashSet() {
-        hashSet.resize(1000005);
+        
     }
     
     void add(int key) {
-        hashSet[key] = 1;
+        int idx = key / 1000, val = key % 1000;
+        for (int i = 0; i < v[idx].size(); i++) {
+            if (v[idx][i] == val) return;
+        }
+        v[idx].push_back(val);
     }
     
     void remove(int key) {
-        hashSet[key] = 0;
+        int idx = key / 1000, val = key % 1000;
+        for (int i = 0; i < v[idx].size(); i++) {
+            if (v[idx][i] == val) {
+                v[idx].erase(v[idx].begin()+i);
+                return;
+            }
+        }
     }
     
-    /** Returns true if this set contains the specified element */
     bool contains(int key) {
-        return hashSet[key];
+        int idx = key / 1000, val = key % 1000;
+        for (int i = 0; i < v[idx].size(); i++) {
+            if (v[idx][i] == val) return true;
+        }
+        return false;
     }
 };
 
