@@ -10,40 +10,36 @@
  */
 class Solution {
 public:
+    
     ListNode* mergeKLists(vector<ListNode*>& lists) {
-        priority_queue< pair<int,pair<int,ListNode*>>, vector<pair<int,pair<int,ListNode*>>>, greater<pair<int,pair<int,ListNode*>>> > pq;
-        //{value,{index,ListNode*}}
-        ListNode* head = new ListNode();
-        ListNode* nxt = new ListNode();
-        bool firstTime = true;
+        priority_queue<pair<int,int>,vector<pair<int,int>>,greater<pair<int,int>>> pq;
+        int cnt = 0;
         for (int i = 0; i < lists.size(); i++) {
-            if (lists[i] != NULL) pq.push({lists[i]->val,{i,lists[i]}});
+            if (lists[i] != nullptr) {
+                cnt++;
+                pq.push(make_pair(lists[i]->val,i));
+            }
         }
-        if (pq.empty()) return NULL;
-        while (!pq.empty()) {
-            pair<int,pair<int,ListNode*>> cur = pq.top();
+        ListNode* head = nullptr, *cur = nullptr;
+        while (cnt > 0) {
+            pair<int,int> p = pq.top();
             pq.pop();
-            if (firstTime) {
-                head = new ListNode(cur.first);
+            //cout << p.first << " ";
+            if (head == nullptr) {
+                head = lists[p.second];
+                cur = head;
             }
             else {
-                nxt->val = cur.first;
+                cur->next = lists[p.second];
+                cur = cur->next;
             }
-            if (cur.second.second->next != NULL) {
-                pq.push({cur.second.second->next->val,{cur.second.first,cur.second.second->next}});
+            lists[p.second] = lists[p.second]->next;
+            if (lists[p.second] == nullptr) cnt--;
+            else {
+                pq.push(make_pair(lists[p.second]->val,p.second));
             }
-            if (!pq.empty()) {
-                if (firstTime) {
-                    head->next = nxt;
-                    firstTime = false;
-                }
-                else {
-                    nxt->next = new ListNode();
-                    nxt = nxt->next;
-                }
-            }
+            cur->next = nullptr;
         }
         return head;
     }
-    
 };
