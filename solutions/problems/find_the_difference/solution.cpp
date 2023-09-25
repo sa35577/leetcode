@@ -1,11 +1,15 @@
 class Solution {
 public:
     char findTheDifference(string s, string t) {
-        sort(s.begin(),s.end());
-        sort(t.begin(),t.end());
-        for (int i = 0; i < s.size(); i++) {
-            if (s[i] != t[i]) return t[i];
+        map<char, int> mp;
+        for (char c : s) {
+            if (mp.find(c) == mp.end()) mp[c] = 1;
+            else mp[c]++;
         }
-        return t[t.size()-1];
+        for (char c : t) {
+            if (mp.find(c) == mp.end() || mp[c] == 0) return c;
+            else mp[c]--;
+        }
+        return '\n';
     }
 };
