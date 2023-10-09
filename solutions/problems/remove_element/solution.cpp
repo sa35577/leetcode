@@ -1,16 +1,17 @@
 class Solution {
 public:
     int removeElement(vector<int>& nums, int val) {
-        int backIdx = nums.size()-1;
         int cnt = 0;
-        for (int i : nums) if (i == val) cnt++;
-        for (int i = 0; i < nums.size()-cnt; i++) {
-            if (nums[i] == val) {
-                while (nums[backIdx] == val) backIdx--;
-                nums[i] = nums[backIdx];
-                nums[backIdx] = val;
-            }
+        for (int x : nums) {
+            if (x != val) cnt++;
         }
-        return nums.size()-cnt;
+        int L = 0, R = nums.size()-1;
+        while (L < R) {
+            while (R >= 0 && nums[R] == val) R--;
+            while (L < nums.size() && nums[L] != val) L++;
+            if (L >= R || R == -1 || L == nums.size()) break;
+            swap(nums[L],nums[R]);
+        }
+        return cnt;
     }
 };
