@@ -1,14 +1,15 @@
 class Solution {
 public:
     int searchInsert(vector<int>& nums, int target) {
-        if (nums.back() < target) return nums.size();
-        int left = 0, right = nums.size()-1;
-        while (left < right) {
-            int mid = (left + right)/2;
-            if (nums[mid] == target) return mid;
-            else if (nums[mid] < target) left = mid+1;
-            else right = mid;
+        int L = 0, R = nums.size()-1;
+        while (L < R) {
+            int mid = (L+R)/2;
+            if (target == nums[mid]) return mid;
+            else if (target > nums[mid]) L = mid+1;
+            else R = mid-1;
         }
-        return right;
+        if (nums[L] == target) return L;
+        if (nums[L] < target) return L+1;
+        return L;
     }
 };
