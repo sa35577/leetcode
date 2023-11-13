@@ -10,4 +10,4 @@ Have fun with your own LeetCode journeys! - Sat
 
 ## Acknowledgements
 
-The extraction of solutions was implemented in this repository: https://github.com/joshcai/leetcode-sync, and I do not take credit for it. 
+The extraction of solutions is ran with a GitHub action, every week by default unless I choose to run the action in a given period of time. It was implemented in this repository: https://github.com/joshcai/leetcode-sync, and I do not take credit for it. 
