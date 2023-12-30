@@ -1,72 +1,43 @@
 class Solution {
 public:
-    int minIncrementForUnique(vector<int>& nums) {
-        map<int, long long> freq;
-        priority_queue<int,vector<int>,greater<int>> pq;
-        for (int i : nums) {
-            if (freq.find(i) == freq.end()) {
-                freq[i] = 1;
-                pq.push(i);
-            }
-            else {
-                freq[i]++;
-                
-            }
+    int sum(int L, int R) {
+        int l1 = L+R;
+        int l2 = R-L+1;
+        if (l1 % 2 == 0) {
+            return (l1/2) * l2;
         }
-        long long sum = 0;
-        while (!pq.empty()) {
-            int cur = pq.top();
-            pq.pop();
-            if (pq.empty()) {
-                //defer all now here
-                long long defer = freq[cur] - 1;
-                sum += (defer * (defer + 1)) / 2;
-                break;
+        return (l2/2) * l1;
+    }
+    int minIncrementForUnique(vector<int>& nums) {
+        int score = 0;
+        sort(nums.begin(),nums.end());
+        int L = 0, R = 0;
+        int numDefer = 0;
+        while (L < nums.size()) {
+            R = L;
+            while (R+1 < nums.size() && nums[R+1] == nums[L]) R++;
+            numDefer += R-L;
+            if (R+1 == nums.size()) {
+                //defer all
+                if (numDefer >= 0) {
+                    score += sum(1,numDefer);
+                    numDefer = 0;
+                }
             }
             else {
-                int nxt = pq.top();
-                long long defer = freq[cur]-1;
-                if (defer < nxt - cur) {
-                    sum += (defer * (defer + 1)) / 2;
+                int numBetween = nums[R+1] - nums[L] - 1; //this is how many we can defer at most
+                if (numBetween >= numDefer) {
+                    score += sum(1,numDefer);
+                    numDefer = 0;
                 }
                 else {
-                    long long canDefer = nxt - cur-1; //spots in between
-                    sum += (canDefer * (canDefer + 1))/2;
-                    long long rem = defer - canDefer;
-                    sum += rem * (nxt - cur);
-                    freq[nxt] += rem;
+                    score += sum(1,numBetween);
+                    numDefer -= numBetween;
+                    score += numDefer * (nums[R+1] - nums[L]);
                 }
             }
-            //cout << sum << " ";
+            L = R+1;
         }
-        return (int)(sum);
-        // map<int,long long> freq;
-        // priority_queue<long long,vector<long long>,greater<long long>> pq;
-        // for (int i : nums) {
-        //     if (freq.find(i) == freq.end()) {
-        //         freq[i] = 1;
-        //     }
-        //     else {
-        //         freq[i]++;
-        //         if (freq[i] == 2) pq.push(i);
-        //     }
-        // }
-        // long long cost = 0;
-        // while (!pq.empty()) {
-        //     int x = pq.top();
-        //     pq.pop();
-        //     for (int i = 1; i <= freq[x]-1; i++) {
-        //         if (freq.find(x+i) != freq.end()) {
-        //             freq[x+i]++;
-        //             if (freq[x+i] == 2) pq.push(x+i);
-        //         }
-        //         else {
-        //             freq[x+i] = 1;
-        //         }
-        //     }
-        //     cost += (freq[x]*(freq[x]-1))/2;
-        //     freq[x] = 1;
-        // }
-        // return (int)(cost);
+        return score;
     }
 };
