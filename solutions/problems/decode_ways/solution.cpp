@@ -1,25 +1,16 @@
 class Solution {
 public:
     int numDecodings(string s) {
-        int dp[101];
-        memset(dp,0,sizeof(dp));
-        dp[0] = 1;
-        for (int i = 0; i < s.size(); i++) {
-            //cout << dp[i] << " ";
-            if (s[i] != '0') {
-                if (INT_MAX - dp[i+1] >= dp[i]) dp[i+1] += dp[i];
-                else dp[i+1] = INT_MAX;
-                
-                if (i != s.size() - 1) {
-                    int val = 10 * (s[i]-'0') + (s[i+1]-'0');
-                    if (val >= 1 && val <= 26) {
-                        if (INT_MAX - dp[i+2] >= dp[i]) dp[i+2] += dp[i];
-                        else dp[i+2] = INT_MAX;
-                    }
+        vector<int> dp(s.size()+1); //dp[i] represents number of ways of s(i...n)
+        dp.back() = 1;
+        for (int tail = s.size()-1; tail >= 0; tail--) {
+            if (s[tail] >= '1' && s[tail] <= '9') dp[tail] += dp[tail+1];
+            if (tail >= 1) {
+                if (s[tail-1] == '1' || (s[tail-1] == '2' && s[tail] >= '0' && s[tail] <= '6')) {
+                    dp[tail-1] += dp[tail+1]; 
                 }
             }
-            
         }
-        return dp[s.size()];
+        return dp[0];
     }
 };
