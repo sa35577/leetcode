@@ -1,39 +1,28 @@
 class Solution {
 public:
     bool intersects(vector<int> &a, vector<int> &b) {
-        if (a[1] < b[0] || b[1] < a[0]) return false;
-        return true;
+        return (a[0] >= b[0] && a[0] <= b[1]) || (a[1] >= b[0] && a[1] <= b[1]);
     }
-    vector<int> unite(vector<int> &a, vector<int> &b) {
-        vector<int> v;
-        if (!intersects(a,b)) return v;
-        v.push_back(min(a[0],b[0]));
-        v.push_back(max(a[1],b[1]));
-        return v;
+    void printInterval(vector<int> &a) {
+        cout << a[0] << " " << a[1] << endl;
     }
     vector<vector<int>> insert(vector<vector<int>>& intervals, vector<int>& newInterval) {
-        // + 2.5 mins
-        vector<vector<int>> newIntervals;
-        int idx = 0;
-        while (idx < intervals.size() && intervals[idx][1] < newInterval[0]) {
-            newIntervals.push_back(intervals[idx]);
-            idx++;
+        intervals.push_back(newInterval);
+        sort(intervals.begin(),intervals.end());
+        vector<vector<int>> ans;
+        int L = 0;
+        while (L < intervals.size()) {
+            int R = L;
+            vector<int> insertingInterval = intervals[L];
+            while (R < intervals.size() && intersects(intervals[R],insertingInterval)) {
+                insertingInterval[1] = max(insertingInterval[1],intervals[R][1]);
+                R++;
+            }
+            R--;
+            ans.push_back(insertingInterval);
+            cout << L << " " << R << endl;
+            L = R+1;
         }
-        // cout << idx << endl;
-        
-        while (idx < intervals.size() && intersects(intervals[idx],newInterval)) {
-            newInterval = unite(newInterval,intervals[idx++]);
-        }
-        
-        newIntervals.push_back(newInterval);
-        while (idx < intervals.size()) {
-            newIntervals.push_back(intervals[idx]);
-            idx++;
-        }
-
-        return newIntervals;
-
-
-
+        return ans;
     }
 };
