@@ -1,26 +1,26 @@
 class Solution {
 public:
     vector<int> productExceptSelf(vector<int>& nums) {
-        if (nums.size() <= 2) {
-            reverse(nums.begin(),nums.end());
-            return nums;
+        vector<int> prefix{nums[0]},suffix{nums.back()};
+        for (int i = 1; i < nums.size(); i++) prefix.push_back(prefix.back() * nums[i]);
+        for (int i = (int)(nums.size())-2; i >= 0; i--) {
+            suffix.push_back(suffix.back() * nums[i]);
         }
-        reverse(nums.begin(),nums.end());
-        vector<int> leftProd, rightProd;
-        leftProd.push_back(nums[0]);
-        for (int i = 1; i < nums.size(); i++) {
-            leftProd.push_back(leftProd.back() * nums[i]);
+        for (int i = 0; i < prefix.size(); i++) {
+            cout << prefix[i] << " ";
         }
-        reverse(nums.begin(),nums.end());
-        reverse(leftProd.begin(),leftProd.end());
-        leftProd.push_back(1);
-        vector<int> res;
-        int num = 1;
-        for (int i = 0; i < nums.size(); i++) {
-            res.push_back(num*leftProd[i+1]);
-            num = num * nums[i];
+        cout << endl;
+        reverse(suffix.begin(),suffix.end());
+        for (int i = 0; i < suffix.size(); i++) {
+            cout << suffix[i] << " ";
         }
-        return res;
-
+        cout << endl;
+        vector<int> ans(nums.size());
+        ans[0] = suffix[1];
+        ans.back() = prefix[prefix.size()-2];
+        for (int i = 1; i < ans.size()-1; i++) {
+            ans[i] = prefix[i-1] * suffix[i+1];
+        }
+        return ans;
     }
 };
