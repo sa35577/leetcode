@@ -1,30 +1,43 @@
 class Solution {
 public:
+    int bsearch(vector<int>& heaters, int house) {
+        int L = 0, R = heaters.size()-1;
+        if (heaters.back() < house) return heaters.size(); 
+        // lower bound search
+        while (L < R) {
+            int mid = (L+R)/2;
+            if (heaters[mid] == house) return mid;
+            else if (heaters[mid] > house) {
+                if (mid-1 >= L && heaters[mid-1] >= house) {
+                    R = mid-1;
+                }
+                else return mid;
+            }
+            else if (heaters[mid] < house) {
+                L = mid+1;
+            }
+        }
+        return L;
+    }
     int findRadius(vector<int>& houses, vector<int>& heaters) {
         sort(houses.begin(),houses.end());
         sort(heaters.begin(),heaters.end());
-        int ans = INT_MIN;
-        int L = 0, R = houses.size()-1;
-        while (L < houses.size() && houses[L] <= heaters[0]) {
-            ans = max(ans,heaters[0]-houses[L]);
-            L++;
-        }
-        if (L == houses.size()) return ans;
-        while (R >= 0 && houses[R] >= heaters.back()) {
-            ans = max(ans,houses[R] - heaters.back());
-            R--;
-        }
-        if (R == -1) return ans;
-        int curIdx = 0;
-        for (int i = L; i <= R; i++) {
-            if (heaters[curIdx] >= houses[i]) {
-                ans = max(ans,heaters[curIdx]-houses[i]);
+        int mx = -1;
+        for (int house : houses) {
+            int idx = bsearch(heaters,house);
+            if (idx == heaters.size()) {
+                idx--;
+                mx = max(mx,abs(heaters[idx] - house));
+            }
+            else if (idx == 0) {
+                mx = max(mx,abs(heaters[idx] - house));
             }
             else {
-                while (curIdx + 1 < heaters.size() && abs(heaters[curIdx+1] - houses[i]) <= abs(heaters[curIdx] - houses[i])) curIdx++;
-                ans = max(ans,abs(heaters[curIdx] - houses[i]));
+                int idx2 = idx;
+                idx2--;
+                mx = max(mx,min(heaters[idx] - house, house - heaters[idx2]));
             }
         }
-        return ans;
+        return mx;
     }
 };
