@@ -1,23 +1,37 @@
 class Solution {
 public:
     vector<int> topKFrequent(vector<int>& nums, int k) {
-        map<int,int> mp;
-        for (int i : nums) {
-            if (mp.find(i) == mp.end()) mp[i] = 1;
-            else mp[i]++;
+        unordered_map<int,int> freq;
+        set<pair<int,int>> st;
+        for (int x : nums) {
+            if (freq.find(x) == freq.end()) {
+                freq[x] = 1;
+                if (st.size() < k) st.insert({1,x});
+                else ; //otherwise theres no kicking since we have 1 frequency is minimal
+            }
+            else {
+                int curFreq = freq[x];
+                if (curFreq >= (*(st.begin())).first) {
+                    auto it = st.lower_bound({curFreq,x});
+                    if (it != st.end() && (*(it)).second == x) {
+                        st.erase(it);
+                        st.insert({curFreq+1,x});
+                    }
+                    else {
+                        st.erase(st.begin());
+                        st.insert({curFreq+1,x});
+                    }
+                }
+                else {
+                    ;
+                }
+                freq[x]++;
+            }
         }
-        set<pair<int,int>> s;
-        for (auto it = mp.begin(); it != mp.end(); it++) {
-            s.insert({it->second,it->first});
-        }
-        int cnt = 0;
         vector<int> res;
-        for (auto rit = s.rbegin(); rit != s.rend(); rit++) {
-            res.push_back(rit->second);
-            ++cnt;
-            if (cnt == k) break;
+        for (pair<int,int> p : st) {
+            res.push_back(p.second);
         }
         return res;
-        
     }
 };
