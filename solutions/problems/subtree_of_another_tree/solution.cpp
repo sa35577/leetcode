@@ -11,17 +11,16 @@
  */
 class Solution {
 public:
-    bool cons(TreeNode* root, TreeNode* subRoot) {
-        if (root == nullptr) {
-            return (subRoot == nullptr);
-        }
-        if (subRoot == nullptr) return false;
+    bool eq(TreeNode* root, TreeNode* subRoot) {
+        if (root == nullptr && subRoot == nullptr) return true;
+        if (root == nullptr || subRoot == nullptr) return false;
         if (root->val != subRoot->val) return false;
-        return (cons(root->left,subRoot->left) && cons(root->right,subRoot->right));
+        return eq(root->left,subRoot->left) && eq(root->right,subRoot->right);
     }
     bool isSubtree(TreeNode* root, TreeNode* subRoot) {
-        if (cons(root,subRoot)) return true;
+        if (root == nullptr && subRoot == nullptr) return true;
         if (root == nullptr || subRoot == nullptr) return false;
-        return (isSubtree(root->left,subRoot) || isSubtree(root->right,subRoot));
+        if (eq(root,subRoot)) return true;
+        return isSubtree(root->left,subRoot) || isSubtree(root->right,subRoot);
     }
 };
