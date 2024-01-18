@@ -1,28 +1,33 @@
 class Solution {
 public:
+    vector<pair<int,int>> getNeighbours(int r, int c, int m, int n) {
+        vector<pair<int,int>> res;
+        if (r-1 >= 0) res.push_back({r-1,c});
+        if (r+1 < m) res.push_back({r+1,c});
+        if (c-1 >= 0) res.push_back({r,c-1});
+        if (c+1 < n) res.push_back({r,c+1});
+        return res;
+    }
     vector<vector<int>> floodFill(vector<vector<int>>& image, int sr, int sc, int color) {
         queue<pair<int,int>> q;
-        q.push(make_pair(sr,sc));
-        int st = image[sr][sc];
-        vector<vector<bool>> vis;
-        
-        for (int i = 0; i < image.size(); i++) {
-            vector<bool> v;
-            for (int j = 0; j < image[0].size(); j++) v.push_back(0);
-            vis.push_back(v);
+        q.push({sr,sc});
+        int startCol = image[sr][sc];
+        image[sr][sc] = color;
+        vector<vector<bool>> vis(image.size());
+        for (vector<bool>&v : vis) {
+            v.resize(image[0].size());
+            fill(v.begin(),v.end(),false);
         }
+        vis[sr][sc] = 1;
         while (!q.empty()) {
-            pair<int,int> p = q.front();
+            pair<int,int> cur = q.front();
+            int r = cur.first, c = cur.second;
             q.pop();
-            
-            if (p.first >= 0 && p.first < image.size() && p.second >= 0 && p.second < image[0].size() && !vis[p.first][p.second]) {
-                vis[p.first][p.second] = 1;
-                if (st == image[p.first][p.second]) {
-                    image[p.first][p.second] = color;
-                    q.push(make_pair(p.first-1,p.second));
-                    q.push(make_pair(p.first+1,p.second));
-                    q.push(make_pair(p.first,p.second-1));
-                    q.push(make_pair(p.first,p.second+1));
+            for (pair<int,int> nxt : getNeighbours(r,c,image.size(),image[0].size())) {
+                if (image[nxt.first][nxt.second] == startCol && !vis[nxt.first][nxt.second]) {
+                    image[nxt.first][nxt.second] = color;
+                    vis[r][c] = true;
+                    q.push(nxt);
                 }
             }
         }
