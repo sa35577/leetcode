@@ -1,22 +1,40 @@
 class RandomizedSet {
 public:
-    set<int> st;
+    unordered_map<int,int> locations;
+    vector<int> v;
     RandomizedSet() {
         
     }
     
     bool insert(int val) {
-        return st.insert(val).second;
+        if (locations.find(val) == locations.end()) {
+            locations[val] = v.size();
+            v.push_back(val);
+            return true;
+        }
+        else return false;
     }
     
     bool remove(int val) {
-        return st.erase(val);
+        if (locations.find(val) == locations.end()) return false;
+        if (v.back() == val) {
+            locations.erase(val);
+            v.pop_back();
+            return true;
+        }
+        int loc = locations[val];
+        int currentInLast = v.back();
+        // int lastIndex = v.size()-1;
+        locations[currentInLast] = loc;
+        v.pop_back();
+        locations.erase(val);
+        v[loc] = currentInLast;
+        return true;
     }
     
     int getRandom() {
-        auto it = st.begin();
-        advance(it,rand() % st.size());
-        return *it;
+        int x = rand() % v.size();
+        return v[x];
     }
 };
 
