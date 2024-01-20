@@ -1,56 +1,55 @@
 class LRUCache {
 public:
-    int lru[10005];
+    deque<pair<int,int>> deck; //deck<key, time>
     int time;
     int c;
-    int op[400005];
-    int kick;
-    int vals[100005];
-    int sz;
-
+    unordered_map<int,pair<int,int>> mp; //map: key -> {value,time}
     LRUCache(int capacity) {
         c = capacity;
         time = 0;
-        fill(lru,lru+10005,0);
-        fill(op,op+400005,0);
-        fill(vals,vals+100005,-1);
-        kick = 0;
-        sz = 0;
     }
     
     int get(int key) {
-        if (vals[key] == -1) return -1;
         time++;
-        lru[key] = time;
-        op[time] = key;
-        return vals[key];
+        if (mp.find(key) != mp.end()) {
+            deck.push_back({key,time});
+            mp[key].second = time;
+            // for (auto it = mp.begin(); it != mp.end(); it++) {
+            //     cout << it->first << ": " << (it->second).first << " " << (it->second).second << endl;
+            // }
+            // cout << "-----\n";
+            return mp[key].first;
+        }
+        // for (auto it = mp.begin(); it != mp.end(); it++) {
+        //     cout << it->first << ": " << (it->second).first << " " << (it->second).second << endl;
+        // }
+        // cout << "-----\n";
+        return -1;
+        
     }
     
     void put(int key, int value) {
         time++;
-        lru[key] = time;
-        op[time] = key;
-
-        if (vals[key] != -1) { //update if already in cache
-            vals[key] = value;
+        if (mp.find(key) != mp.end() || mp.size() < c) {
+            mp[key] = {value,time};
+            deck.push_back({key,time});
         }
-
-        else if (sz < c) { //if room in cache, simply add to cache
-            sz++;
-            vals[key] = value;
-            
-        }
-        else { //kick
-            while (true) {
-                kick++;
-                if (lru[op[kick]] == kick) {
+        else {
+            while (!deck.empty()) {
+                if (mp.find(deck.front().first) != mp.end() && mp[deck.front().first].second == deck.front().second) {
                     break;
                 }
+                else deck.pop_front();
             }
-            //kick number in op[kick]
-            vals[op[kick]] = -1;
-            vals[key] = value;
+            mp.erase(deck.front().first);
+            deck.pop_front();
+            mp[key] = {value,time};
+            deck.push_back({key,time});
         }
+        // for (auto it = mp.begin(); it != mp.end(); it++) {
+        //     cout << it->first << ": " << (it->second).first << " " << (it->second).second << endl;
+        // }
+        // cout << "-----\n";
     }
 };
 
