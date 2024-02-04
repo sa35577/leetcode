@@ -1,22 +1,17 @@
 class Solution {
 public:
     bool canPartition(vector<int>& nums) {
+        vector<bool> v(20005);
+        fill(v.begin(),v.end(),false);
         int sum = 0;
-        for (int x : nums) sum += x;
-        if (sum % 2 == 1) return false;
-        bool dp[20005];
-        bool ndp[20005];
-        fill(dp,dp+20005,false);
-        fill(ndp,ndp+20005,false);
-        dp[0] = 1;
+        v[0] = true;
         for (int x : nums) {
-            for (int i = 0; i < 20005; i++) {
-                if (dp[i]) ndp[i+x] = 1;
+            for (int i = 20000; i >= 0; i--) {
+                if (v[i]) v[i + x] = true;
             }
-            for (int i = 0; i < 20005; i++) {
-                dp[i] = ndp[i];
-            }
+            sum += x;
         }
-        return dp[sum/2];
+        return (sum % 2 == 0 && v[sum/2]);
+        
     }
 };
