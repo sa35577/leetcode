@@ -1,55 +1,57 @@
 class LRUCache {
 public:
-    deque<pair<int,int>> deck; //deck<key, time>
-    int time;
-    int c;
-    unordered_map<int,pair<int,int>> mp; //map: key -> {value,time}
+    /*
+    have a time array for what transaction happened at what time
+    keep a map of the last tracked time of something actually going
+    */
+    unordered_map<int,int> lastTime;
+    pair<int,int> data[200005]; //map: time -> {key,value}
+    int rem;
+    int t;
+    int kick;
     LRUCache(int capacity) {
-        c = capacity;
-        time = 0;
+        rem = capacity;
+        for (int i = 0; i < 200005; i++) data[i] = {-1,-1};
+        t = 0;
+        kick = 0;
     }
     
     int get(int key) {
-        time++;
-        if (mp.find(key) != mp.end()) {
-            deck.push_back({key,time});
-            mp[key].second = time;
-            // for (auto it = mp.begin(); it != mp.end(); it++) {
-            //     cout << it->first << ": " << (it->second).first << " " << (it->second).second << endl;
-            // }
-            // cout << "-----\n";
-            return mp[key].first;
-        }
-        // for (auto it = mp.begin(); it != mp.end(); it++) {
-        //     cout << it->first << ": " << (it->second).first << " " << (it->second).second << endl;
+        t++;
+        if (lastTime.find(key) == lastTime.end()) return -1;
+        int value = data[lastTime[key]].second;
+        data[t] = {key,value};
+        lastTime[key] = t;
+        // for (auto it = lastTime.begin(); it != lastTime.end(); it++) {
+        //     cout << it->first << ": " << it->second << endl;
         // }
-        // cout << "-----\n";
-        return -1;
-        
+        // cout << "------\n";
+        return value;
     }
     
     void put(int key, int value) {
-        time++;
-        if (mp.find(key) != mp.end() || mp.size() < c) {
-            mp[key] = {value,time};
-            deck.push_back({key,time});
+        t++;
+        if (lastTime.find(key) != lastTime.end()) {
+            data[t] = {key,value};
+            lastTime[key] = t;
+        }
+        else if (rem > 0) {
+            rem--;
+            data[t] = {key,value};
+            lastTime[key] = t;
         }
         else {
-            while (!deck.empty()) {
-                if (mp.find(deck.front().first) != mp.end() && mp[deck.front().first].second == deck.front().second) {
-                    break;
-                }
-                else deck.pop_front();
-            }
-            mp.erase(deck.front().first);
-            deck.pop_front();
-            mp[key] = {value,time};
-            deck.push_back({key,time});
+            //rem == 0
+            while (data[kick].first == -1 || lastTime.find(data[kick].first) == lastTime.end() || lastTime[data[kick].first] != kick) kick++;
+            lastTime.erase(data[kick].first);
+            kick++;
+            data[t] = {key,value};
+            lastTime[key] = t;
         }
-        // for (auto it = mp.begin(); it != mp.end(); it++) {
-        //     cout << it->first << ": " << (it->second).first << " " << (it->second).second << endl;
+        // for (auto it = lastTime.begin(); it != lastTime.end(); it++) {
+        //     cout << it->first << ": " << it->second << endl;
         // }
-        // cout << "-----\n";
+        // cout << "------\n";
     }
 };
 
