@@ -1,48 +1,47 @@
 class Solution {
 public:
-    bool exists(vector<vector<char>>& board, string &word, int curRow, int curCol, int pos, int deltaRow, int deltaCol, vector<vector<bool>>& vis) {
-        if (pos == word.size()) return true;
-        if (curRow < 0 || curRow >= board.size() || curCol < 0 || curCol >= board[0].size()) return false;
-        if (word[pos] != board[curRow][curCol]) return false;
-        if (vis[curRow][curCol]) return false;
-        vis[curRow][curCol] = true;
-        if (!(deltaRow == 1 && deltaCol == 0)) {
-            if (exists(board,word,curRow+1,curCol,pos+1,-1,0,vis)) return true;
+    vector<pair<int,int>> getNeighbours(int r, int c, int numRows, int numCols) {
+        vector<pair<int,int>> v;
+        if (r > 0) v.push_back({r-1,c});
+        if (r + 1 < numRows) v.push_back({r+1,c});
+        if (c > 0) v.push_back({r,c-1});
+        if (c + 1 < numCols) v.push_back({r,c+1});
+        return v;
+    }
+    bool dfs(vector<vector<char>>& board, vector<vector<bool>>& vis, string word, int idx, int r, int c) {
+        if (idx == word.size() - 1) return true;
+        vis[r][c] = true;
+
+        for (pair<int,int> &nextpos : getNeighbours(r,c,board.size(),board[0].size())) {
+            if (!vis[nextpos.first][nextpos.second] && board[nextpos.first][nextpos.second] == word[idx+1] && dfs(board,vis,word,idx+1,nextpos.first,nextpos.second)) return true;
         }
-        if (!(deltaRow == -1 && deltaCol == 0)) {
-            if (exists(board,word,curRow-1,curCol,pos+1,1,0,vis)) return true;
-        }
-        if (!(deltaRow == 0 && deltaCol == 1)) {
-            if (exists(board,word,curRow,curCol+1,pos+1,0,-1,vis)) return true;
-        }
-        if (!(deltaRow == 0 && deltaCol == -1)) {
-            if (exists(board,word,curRow,curCol-1,pos+1,0,1,vis)) return true;
-        }
-        vis[curRow][curCol] = false;
+
+        vis[r][c] = false;
         return false;
     }
     bool exist(vector<vector<char>>& board, string word) {
-        vector<vector<bool>> vis;
-        int freq[256];
-        fill(freq,freq+256,0);
-        int r = board.size(), c = board[0].size();
-        for (int i = 0; i < r; i++) {
-            vector<bool> v;
-            for (int j = 0; j < c; j++) {
-                v.push_back(false);
-                freq[(int)board[i][j]]++;
+        //check frequency of characters and see if it is even possible for the word to exist
+        map<char,int> boardFreq;
+        for (vector<char> & v : board) {
+            for (char &c : v) {
+                if (boardFreq.find(c) == boardFreq.end()) boardFreq[c] = 0;
+                boardFreq[c]++;
             }
-            vis.push_back(v);
         }
-        int wordfreq[256];
-        fill(wordfreq,wordfreq+256,0);
-        for (char c : word) {
-            wordfreq[(int)c]++;
-            if (wordfreq[(int)c] > freq[(int)c]) return false;
+        for (char &c : word) {
+            if (boardFreq.find(c) == boardFreq.end() || boardFreq[c] == 0) return false;
+            boardFreq[c]--;
         }
-        for (int i = 0; i < r; i++) {
-            for (int j = 0; j < c; j++) {
-                if (exists(board,word,i,j,0,0,0,vis)) return true;
+        //use a dfs solution from all the starting chars
+        vector<vector<bool>> vis(board.size(), vector<bool>(board[0].size()));
+        for (vector<bool> & b : vis) {
+            fill(b.begin(),b.end(),false);
+        }
+        for (int i = 0; i < board.size(); i++) {
+            for (int j = 0; j < board[0].size(); j++) {
+                if (board[i][j] == word[0]) {
+                    if (dfs(board,vis,word,0,i,j)) return true;
+                }
             }
         }
         return false;
